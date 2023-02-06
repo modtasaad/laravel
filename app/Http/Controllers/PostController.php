@@ -2,29 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
     public function index()
     {
-        $allPosts = [
-            [
-                'id' => 1,
-                'title' => 'laravel',
-                'description' => 'hello this is laravel post',
-                'posted_by' => 'Ahmed',
-                'created_at' => '2022-01-28 10:05:00',
-            ],
-            [
-                'id' => 2,
-                'title' => 'php',
-                'description' => 'hello this is php post',
-                'posted_by' => 'Mohamed',
-                'created_at' => '2022-01-30 10:05:00',
-            ],
-        ];
-//        dd($allPosts);
+        //select * from posts;
+        $allPosts = Post::all();
+
         return view('posts.index',[
             'posts' => $allPosts,
         ]);
@@ -32,59 +20,74 @@ class PostController extends Controller
 
     public function create()
     {
-        return view('posts.create');
+        $users = User::get();
+        // dd($users);
+        return view('posts.create',[
+            'users' => $users,
+        ]);
     }
 
-    public function store()
+    public function store(Request $request)
     {
-        return 'insert in database';
+        $data = $request->all();
+        // dd($data);
+        $title = $data['title'];
+        $description = $data['description'];
+        $userId = $data['Post_Creator'];
+        Post::create([
+            'title' => $title,
+            'description' => $description,
+            'user_id' => $userId,
+        ]);
+
+        return to_route('posts.index');
+    }
+
+     public function edit($postId)
+    {
+        $post = Post::find($postId);
+        $users = User::get();
+        return view('posts.edit', compact('post'),['users' => $users,]);  
+    }
+
+    public function update(Request $request, $postId)
+    {
+        $request->validate([
+            'title'=>'required',
+            'description'=>'required',
+        ]); 
+        $post = post::find($postId);
+        $post->title =  $request->get('title');
+        $post->description = $request->get('description');
+        $post->save();
+ 
+        return redirect('/posts')->with('success', ' postes updated.');
     }
    
-
     public function show($postId)
     {
-        // dd($postId);
-        $allPosts = [
-            [
-                'id' => 1,
-                'title' => 'laravel',
-                'description' => 'hello this is laravel post',
-                'posted_by' => 'Ahmed',
-                'created_at' => '2022-01-28 10:05:00',
-            ],
-            [
-                'id' => 2,
-                'title' => 'php',
-                'description' => 'hello this is php post',
-                'posted_by' => 'Mohamed',
-                'created_at' => '2022-01-30 10:05:00',
-            ],
-        ];
-        return view('posts.show' ,[ 'posts' => $allPosts,] );
+        $post = Post::find($postId);
+        // dd($post);
+        return view('posts.show',[ 'post' => $post,]);
     }
 
-    
-    public function update()
+
+    public function destroy($postId)
     {
-        return view('posts.update'); 
-    }
-
-
-    public function modify()
-    {
-        return 'update in database';
-    }
-
-    public function delete()
-    {
-        
-        return view('posts.delete'); 
-    }
-
-    public function confirm()
-    {
-        return 'delete in database';
-    }
-    
-
+        // $post = Post::where('id', $postId)->get()->restore();
+        $post = post::find($postId);
+        $post->delete(); 
+ 
+        return redirect('/posts')->with('success', 'post removed.'); 
+    } 
 }
+
+
+   
+
+
+
+
+   
+
+

@@ -24,12 +24,14 @@ Route::get('/posts/create', [PostController::class, 'create'])->name('posts.crea
 
 Route::post('/posts', [PostController::class, 'store']);
 
-Route::get('/posts/update', [PostController::class, 'update'])->name('posts.update');
+Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
+
+
+Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
  
-Route::post('/posts', [PostController::class, 'modify']);
 
-Route::get('/posts/delete', [PostController::class, 'delete'])->name('posts.delete');
 
-Route::post('/posts', [PostController::class, 'confirm']);
+Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.delete');
+
 
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');

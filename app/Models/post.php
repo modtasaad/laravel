@@ -13,6 +13,7 @@ class post extends Model
     protected $fillable = [
         'title',
         'description',
+        'imges',
         'user_id',
     ];
 

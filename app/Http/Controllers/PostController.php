@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\User;
+use App\Http\Requests\postrequest;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 
 class PostController extends Controller
 {
@@ -27,10 +29,19 @@ class PostController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request,postrequest $postrequest)
     {
         $data = $request->all();
         // dd($data);
+        if($request->hasFile('imge')){
+            $destination_path = '/public/image';
+            $image = $request->file('image');
+            $image_name = $image->getClientOriginalName();
+            $path = $request->file('image')->storeAs($destination_path, $image_name);
+
+            $data['imge'] = $image_name;
+
+        } 
         $title = $data['title'];
         $description = $data['description'];
         $userId = $data['Post_Creator'];
@@ -50,12 +61,9 @@ class PostController extends Controller
         return view('posts.edit', compact('post'),['users' => $users,]);  
     }
 
-    public function update(Request $request, $postId)
+    public function update(postrequest $request, $postId)
     {
-        $request->validate([
-            'title'=>'required',
-            'description'=>'required',
-        ]); 
+        
         $post = post::find($postId);
         $post->title =  $request->get('title');
         $post->description = $request->get('description');

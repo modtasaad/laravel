@@ -33,22 +33,27 @@ class PostController extends Controller
     {
         $data = $request->all();
         // dd($data);
+
+        
         if($request->hasFile('imge')){
             $destination_path = '/public/image';
             $image = $request->file('image');
             $image_name = $image->getClientOriginalName();
             $path = $request->file('image')->storeAs($destination_path, $image_name);
 
-            $data['imge'] = $image_name;
+            $data['image'] = $image_name;
 
         } 
         $title = $data['title'];
         $description = $data['description'];
         $userId = $data['Post_Creator'];
+        $image = $data['image'];
         Post::create([
             'title' => $title,
             'description' => $description,
             'user_id' => $userId,
+            'image'=>$image,
+
         ]);
 
         return to_route('posts.index');
